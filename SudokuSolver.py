@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from sudoku import Sudoku
+import json
 
 def generate_puzzle(difficulty=0.5):
     puzzle = None
@@ -39,4 +40,8 @@ print(f"List in cell (4, 5): {sudoku_grid[4, 5]}")
 print(sudoku_output)
 
 def select_next(look_ahead_table):
-    
+    return look_ahead_table
+
+with open("sudoku_output.json", "w") as f:
+    json.dump(sudoku_output.tolist(), f)
+
