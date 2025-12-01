@@ -16,17 +16,21 @@ def board_to_numpy(board):
     return np.array(clean, dtype=int)
 
 generated_grid = generate_puzzle(0.5)
-starting_grid = board_to_numpy(generated_grid.board)
+sudoku_output = board_to_numpy(generated_grid.board)
 
 
 sudoku_grid = np.empty((9, 9), dtype=object)
 
 for r in range(9):
     for c in range(9):
-        sudoku_grid[r, c] = list(range(1, 10))  # Assign a new list to each cell
+        if(sudoku_output[r, c] > 0):
+            sudoku_grid[r, c] = list()
+            set_value = int(sudoku_output[r, c])
+            sudoku_grid[r, c].append(set_value)
+        else:
+            sudoku_grid[r, c] = list(range(1, 10))  # Assign a new list to each cell
 
 
-sudoku_output = np.zeros((9, 9))
 
 print(sudoku_grid)
 
@@ -34,5 +38,5 @@ print(sudoku_grid)
 print(f"\nList in cell (0, 0): {sudoku_grid[0, 0]}")
 print(f"List in cell (4, 5): {sudoku_grid[4, 5]}")
 
-print(starting_grid)
+print(sudoku_output)
 
