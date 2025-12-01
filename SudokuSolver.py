@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from sudoku import Sudoku
+import json
 
 def generate_puzzle(difficulty=0.5):
     puzzle = None
@@ -39,4 +40,7 @@ print(f"\nList in cell (0, 0): {sudoku_grid[0, 0]}")
 print(f"List in cell (4, 5): {sudoku_grid[4, 5]}")
 
 print(sudoku_output)
+
+with open("sudoku_output.json", "w") as f:
+    json.dump(sudoku_output.tolist(), f)
 
