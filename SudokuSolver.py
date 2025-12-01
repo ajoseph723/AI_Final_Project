@@ -1,5 +1,9 @@
 import sys
 import numpy as np
+from sudoku import Sudoku
+
+starting_grid = np.array(Sudoku(3).difficulty(0.5))
+
 
 sudoku_grid = np.empty((9, 9), dtype=object)
 
@@ -16,6 +20,6 @@ print(sudoku_grid)
 print(f"\nList in cell (0, 0): {sudoku_grid[0, 0]}")
 print(f"List in cell (4, 5): {sudoku_grid[4, 5]}")
 
-print(sudoku_output)
+print(starting_grid)
 
 
