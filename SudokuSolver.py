@@ -30,8 +30,6 @@ for r in range(9):
         else:
             sudoku_grid[r, c] = list(range(1, 10))  # Assign a new list to each cell
 
-
-
 print(sudoku_grid)
 
 # Access a specific cell and its list
@@ -40,3 +38,5 @@ print(f"List in cell (4, 5): {sudoku_grid[4, 5]}")
 
 print(sudoku_output)
 
+def select_next(look_ahead_table):
+    
