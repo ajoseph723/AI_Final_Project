@@ -43,12 +43,33 @@ def calculate_dependent_cells(r, c, sudoku_grid):
     return dependencies
 
 #determines what cell to select next based on constraints
-#1.Most Constrained (least canidates), 2.Most Constraining (most dependent_cells)
+#1.Most Constrained (least constraints), 2.Most Constraining (most dependent_cells)
 #INPUT look_ahead_table to check constraints and dependent_cells
 #RETURNS (r, c) of cell to select next
-def select_next(look_ahead_table):
+def select_next(look_ahead_table, output_grid):
+    #variables for most constrained selection
+    most_constrained = list()
+    min_constraints = 81
 
-    return look_ahead_table
+    for i in range(9):
+        for j in range(9):
+            #check if (i, j) has already been assigned
+            if output_grid[i, j] == 0:
+                #check if num of constraints is less than current min
+                if len(look_ahead_table[i, j]['constraints']) < min_constraints:
+                    most_constrained.clear()
+                    most_constrained.append((i, j))
+                    min_constraints = len(look_ahead_table[i, j]['constraints'])
+                elif len(look_ahead_table[i, j]['constraints']) == min_constraints:
+                    most_constrained.append((i, j))
+                
+    selected_cell = most_constrained[0]
+    #from list check which cell is most constraining
+    for cell in most_constrained:
+        if len(look_ahead_table[cell]) < len(look_ahead_table[selected_cell]):
+            selected_cell = cell
+    
+    return selected_cell
 
 #check assigning a value for cell (r, c)
 #checks every possible available constraint for the cell until one works
@@ -65,7 +86,7 @@ def check_move(r, c, look_ahead_table):
 #adjusts look_ahead_table constraints for (r, c) and it's dependent_cells
 #INPUT cell (r, c), num_to_assign to (r, c), look_ahead_table, output_grid
 def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
-
+    return
 
 
 generated_grid = generate_puzzle(0.5)
@@ -80,33 +101,37 @@ for r in range(9):
         dependent_cells = calculate_dependent_cells(r, c, sudoku_output)
 
         #create a dictionary for each cell
-        #canidates are possible values for the cell
+        #constraints are possible values for the cell
         #dependent_cells are cells that are affected by the value of cell (r, c)
         cell_data = {
-            "canidates": [],
+            "constraints": [],
             "dependent_cells": dependent_cells
         }
         if(sudoku_output[r, c] > 0):
             set_value = int(sudoku_output[r, c])
-            cell_data['canidates'].append(set_value)
+            cell_data['constraints'].append(set_value)
         else:
-            cell_data['canidates'] = list(range(1, 10))
+            cell_data['constraints'] = list(range(1, 10))
         
         #assign the value to the cell in the look ahead table
         sudoku_look_ahead_table[r, c] = cell_data  # Assign a new list to each cell
 
 for r in range(9):
     for c in range(9):
-        print(sudoku_look_ahead_table[r, c]['canidates'])
+        print(sudoku_look_ahead_table[r, c]['constraints'])
 
 
 # Access a specific cell and its list
-print(f"\nList in cell (0, 0): {sudoku_look_ahead_table[0, 0]['canidates']}")
-print(f"List in cell (4, 5): {sudoku_look_ahead_table[4, 5]['canidates']}")
+print(f"\nList in cell (0, 0): {sudoku_look_ahead_table[0, 0]['constraints']}")
+print(f"List in cell (4, 5): {sudoku_look_ahead_table[4, 5]['constraints']}")
 
 for r in range(9):
     for c in range(9):
         print(sudoku_look_ahead_table[r, c]['dependent_cells'])
+
+cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
+
+print(cell_to_select)
 
 print(sudoku_output)
 
