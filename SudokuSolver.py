@@ -16,6 +16,9 @@ def board_to_numpy(board):
         clean.append([cell if cell is not None else 0 for cell in row])
     return np.array(clean, dtype=int)
 
+#calculates what cells are affected by cell (r, c)
+#INPUT cell to check and output_grid of integers
+#RETURNS a set of dependent cells
 def calculate_dependent_cells(r, c, sudoku_grid):
     dependencies = set()
 
@@ -38,6 +41,32 @@ def calculate_dependent_cells(r, c, sudoku_grid):
                 dependencies.add((i, j))
     
     return dependencies
+
+#determines what cell to select next based on constraints
+#1.Most Constrained (least canidates), 2.Most Constraining (most dependent_cells)
+#INPUT look_ahead_table to check constraints and dependent_cells
+#RETURNS (r, c) of cell to select next
+def select_next(look_ahead_table):
+
+    return look_ahead_table
+
+#check assigning a value for cell (r, c)
+#checks every possible available constraint for the cell until one works
+#checks how assigning a constraint affects the constraints the dependent_cells
+#makes sure the move leaves a possible constraint for every depependent cell
+#INPUT cell (r, c) to check moves, look_ahead_table to use to check
+#RETURNS number to assign (0 if no numbers worked)
+def check_move(r, c, look_ahead_table):
+    num_to_assign = 0
+    return num_to_assign
+
+#assumes move will work
+#sets num_to_assign to the output_grid cell (r, c)
+#adjusts look_ahead_table constraints for (r, c) and it's dependent_cells
+#INPUT cell (r, c), num_to_assign to (r, c), look_ahead_table, output_grid
+def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
+
+
 
 generated_grid = generate_puzzle(0.5)
 sudoku_output = board_to_numpy(generated_grid.board)
@@ -81,32 +110,6 @@ for r in range(9):
 
 print(sudoku_output)
 
-def calculate_dependent_cells(r, c, sudoku_grid):
-    dependencies = set()
-
-    #get dependent cells for the row and column
-    for i in range(9):
-        #checks it is is not its own cell and if the 
-        if i != c and sudoku_grid[r, i] > 0: dependencies.add((r, i))
-        if i != r and sudoku_grid[i, c] > 0: dependencies.add((i, c))
-
-    #get the cells in the 3x3 grid in the cell
-    #get the start row and column
-    start_row = (r // 3) * 3
-    start_col = (c // 3) * 3
-
-    #check each in cell in the 3x3 space and add them
-    for i in range(start_row, start_row+3):
-        for j in range(start_col, start_col+3):
-            
-            if (i, j) != (r, c) and sudoku_grid[i, j] > 0:
-                dependencies.add((i, j))
-    
-    return dependencies
-
-def select_next(look_ahead_table):
-
-    return look_ahead_table
 
 with open("sudoku_output.json", "w") as f:
     json.dump(sudoku_output.tolist(), f)
