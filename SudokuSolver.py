@@ -80,6 +80,8 @@ def select_next(look_ahead_table, output_grid):
 #RETURNS number to assign (0 if no numbers worked)
 def check_move(r, c, look_ahead_table):
     num_to_assign = 0
+    for constraint in look_ahead_table[r, c]['constraints']:
+        print("Constraint: ", constraint)
     return num_to_assign
 
 #assumes move will work
