@@ -74,15 +74,34 @@ def select_next(look_ahead_table, output_grid):
 
 #check assigning a value for cell (r, c)
 #checks every possible available constraint for the cell until one works
-#checks how assigning a constraint affects the constraints the dependent_cells
+#checks how assigning a constraint affects the constraints of the dependent_cells
 #makes sure the move leaves a possible constraint for every depependent cell
 #INPUT cell (r, c) to check moves, look_ahead_table to use to check
 #RETURNS number to assign (0 if no numbers worked)
 def check_move(r, c, look_ahead_table):
-    num_to_assign = 0
-    for constraint in look_ahead_table[r, c]['constraints']:
-        print("Constraint: ", constraint)
-    return num_to_assign
+    #the cell we are checking moves for
+    cell = look_ahead_table[r, c]
+
+    #iterates through contraints for cell
+    for constraint_value in cell['constraints']:
+        valid = True
+        #checks the constraint against the constraints of the dependent_cells of cell
+        for dCell in cell['dependent_cells']:
+            row = dCell[0]
+            col = dCell[1] 
+            dependent_cell = look_ahead_table[row, col] 
+
+            #only necessary check is to ensure that the dependent cell with 1 constraint
+            #is not going to become invalidated with this move.
+            #Other dependent cells with >1 constraints would still have at least 1 constraint left
+            if (len(dependent_cell["constraints"]) == 1):
+                if (dependent_cell["constraints"][0] == constraint_value):
+                    valid = False
+                    break
+
+        if (valid):
+            return constraint_value
+    return 0
 
 #assumes move will work
 #sets num_to_assign to the output_grid cell (r, c)
