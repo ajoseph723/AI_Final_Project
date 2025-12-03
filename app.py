@@ -5,6 +5,13 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    """Renders the HTML file."""
     return render_template('Frontend.html')
 
+@app.route('/sudoku_data')
+def sudoku_data():
+    puzzle = generate_puzzle()
+    numpy_grid = board_to_numpy(puzzle.board)
+    return jsonify(numpy_grid.tolist())
+
+if __name__ == '__main__':
+    app.run(debug=True)
