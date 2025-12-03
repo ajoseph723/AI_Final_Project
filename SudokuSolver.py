@@ -25,8 +25,8 @@ def calculate_dependent_cells(r, c, sudoku_grid):
     #get dependent cells for the row and column
     for i in range(9):
         #checks it is is not its own cell and if the 
-        if i != c and sudoku_grid[r, i] > 0: dependencies.add((r, i))
-        if i != r and sudoku_grid[i, c] > 0: dependencies.add((i, c))
+        if i != c and sudoku_grid[r, i] == 0: dependencies.add((r, i))
+        if i != r and sudoku_grid[i, c] == 0: dependencies.add((i, c))
 
     #get the cells in the 3x3 grid in the cell
     #get the start row and column
@@ -64,9 +64,10 @@ def select_next(look_ahead_table, output_grid):
                     most_constrained.append((i, j))
                 
     selected_cell = most_constrained[0]
+
     #from list check which cell is most constraining
     for cell in most_constrained:
-        if len(look_ahead_table[cell]) < len(look_ahead_table[selected_cell]):
+        if len(look_ahead_table[cell]) > len(look_ahead_table[selected_cell]):
             selected_cell = cell
     
     return selected_cell
@@ -86,6 +87,23 @@ def check_move(r, c, look_ahead_table):
 #adjusts look_ahead_table constraints for (r, c) and it's dependent_cells
 #INPUT cell (r, c), num_to_assign to (r, c), look_ahead_table, output_grid
 def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
+    #set output_grid value to num_to_assign
+    output_grid[r, c] = num_to_assign
+    
+    #update cell (r, c) constraints
+    look_ahead_table[r, c]['constraints'] = [num_to_assign]
+
+    #update dependent cell constraints
+    for cell in look_ahead_table[r, c]['dependent_cells']:
+        try:
+            #print(f"{cell}, {cell[0]}, {cell[1]}")
+            row = cell[0]
+            col = cell[1]
+            #print(look_ahead_table[row, col]['constraints'])
+            look_ahead_table[cell[0], cell[1]]['constraints'].remove(num_to_assign)
+        except:
+            pass
+
     return
 
 
@@ -115,6 +133,13 @@ for r in range(9):
         
         #assign the value to the cell in the look ahead table
         sudoku_look_ahead_table[r, c] = cell_data  # Assign a new list to each cell
+
+#setting up every cell from initial grid
+for r in range(9):
+    for c in range(9):
+        if(sudoku_output[r, c] > 0):
+            make_move(r, c, int(sudoku_output[r, c]), sudoku_look_ahead_table, sudoku_output)
+
 
 for r in range(9):
     for c in range(9):
