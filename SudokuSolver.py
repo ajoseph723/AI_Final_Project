@@ -37,7 +37,7 @@ def calculate_dependent_cells(r, c, sudoku_grid):
     for i in range(start_row, start_row+3):
         for j in range(start_col, start_col+3):
             
-            if (i, j) != (r, c) and sudoku_grid[i, j] > 0:
+            if (i, j) != (r, c) and sudoku_grid[i, j] == 0:
                 dependencies.add((i, j))
     
     return dependencies
