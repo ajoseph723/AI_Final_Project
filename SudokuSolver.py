@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from sudoku import Sudoku
 import json
+from flask import Flask, render_template, request
 
 def generate_puzzle(difficulty=0.5):
     puzzle = None
