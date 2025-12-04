@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 from SudokuSolver import generate_puzzle, board_to_numpy, calculate_dependent_cells, make_move, completeStep, completeSudoku
 import numpy as np
+import threading
 
 app = Flask(__name__)
+
+solver_lock = threading.Lock()
 
 puzzle = generate_puzzle()
 sudoku_output = board_to_numpy(puzzle.board)
@@ -15,10 +18,11 @@ def index():
     if request.method == 'POST':
         if 'action_button' in request.form:
             button_value = request.form['action_button']
-            if button_value == 'nextStep':
-                completeStep(sudoku_look_ahead_table, sudoku_output)
-            elif button_value == 'finish':
-                completeSudoku(sudoku_look_ahead_table, sudoku_output)
+            with solver_lock:
+                if button_value == 'nextStep':
+                    completeStep(sudoku_look_ahead_table, sudoku_output)
+                elif button_value == 'finish':
+                    completeSudoku(sudoku_look_ahead_table, sudoku_output)
     return render_template('Frontend.html')
 
 @app.route('/sudoku_data')

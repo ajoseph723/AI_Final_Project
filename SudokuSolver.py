@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from sudoku import Sudoku
 import json
+import copy
 from flask import Flask, render_template, request
 
 def generate_puzzle(difficulty=0.9):
@@ -79,54 +80,51 @@ def select_next(look_ahead_table, output_grid):
 #makes sure the move leaves a possible constraint for every depependent cell
 #INPUT cell (r, c) to check moves, look_ahead_table to use to check
 #RETURNS number to assign (0 if no numbers worked)
-def check_move(r, c, look_ahead_table, output_grid, current_iteration, max_iteration=5):
+def check_move(r, c, look_ahead_table, output_grid, current_iteration=0, max_iteration=5):
     #the cell we are checking moves for
     cell = look_ahead_table[r, c]
 
     #iterates through contraints for cell
     for constraint_value in cell['constraints']:
-        look_ahead_table_copy = look_ahead_table
-        if valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table_copy, output_grid):
+        look_ahead_table_copy = copy.deepcopy(look_ahead_table)
+        output_grid_copy = output_grid.copy()
+        if valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table_copy, output_grid_copy, current_iteration, max_iteration):
             return constraint_value
     return 0
 
-def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, output_grid, visited=None):
-    if visited is None:
-        visited = set()
-
-    if (r, c, constraint_value) in visited:
-        return True
-    
-    visited.add((r, c, constraint_value))
+def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, output_grid, current_iteration, max_iteration):
     cell = look_ahead_table[r, c]
 
-    #checks the constraint against the constraints of the dependent_cells of cell
-    for dR, dC in cell["dependent_cells"]:
-        dependent = look_ahead_table[dR, dC]
+    if len(cell["dependent_cells"]) >= 1:
 
-        #only necessary check is to ensure that the dependent cell with 1 constraint
-        #is not going to become invalidated with this move.
-        #Other dependent cells with >1 constraints would still have at least 1 constraint left
-        if len(dependent["constraints"]) == 1:
-            only_value = dependent["constraints"][0]
-            if (only_value == constraint_value):
-                return False
+        #checks the constraint against the constraints of the dependent_cells of cell
+        for dR, dC in cell["dependent_cells"]:
+            dependent = look_ahead_table[dR, dC]
+
+            #only necessary check is to ensure that the dependent cell with 1 constraint
+            #is not going to become invalidated with this move.
+            #Other dependent cells with >1 constraints would still have at least 1 constraint left
+            if len(dependent["constraints"]) == 1:
+                only_value = dependent["constraints"][0]
+                if (only_value == constraint_value):
+                    return False
             
-    #update cell (r, c) constraints
-    look_ahead_table[r, c]['constraints'] = list()
+    make_move(r, c, constraint_value, look_ahead_table, output_grid)
+    
+    if puzzleIsComplete(output_grid):
+        return True
+    
+    if current_iteration <= max_iteration: 
+        next_cell = select_next(look_ahead_table, output_grid)
 
-    #update dependent cell constraints
-    for cell in look_ahead_table[r, c]['dependent_cells']:
-        try:
-            #print(f"{cell}, {cell[0]}, {cell[1]}")
-            row = cell[0]
-            col = cell[1]
-            #print(look_ahead_table[row, col]['constraints'])
-            look_ahead_table[cell[0], cell[1]]['constraints'].remove(constraint_value)
-        except:
-            pass
-
-    next_cell = select_next(look_ahead_table, output_grid)
+        print(f"Iteration num - {current_iteration}: {next_cell}")
+        current_iteration = current_iteration + 1
+        print(f"constraints: {look_ahead_table[next_cell[0], next_cell[1]]["constraints"]}")
+        print(f"dependents: {look_ahead_table[next_cell[0], next_cell[1]]["dependent_cells"]}")
+        val_to_input = check_move(next_cell[0], next_cell[1], look_ahead_table, output_grid, current_iteration, max_iteration)
+        
+        if val_to_input == 0:
+            return False
     
     
     return True
@@ -141,9 +139,9 @@ def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
     output_grid[r, c] = num_to_assign
     
     #update cell (r, c) constraints
-    look_ahead_table[r, c]['constraints'] = [num_to_assign]
+    look_ahead_table[r, c]['constraints'] = list()
 
-    #update dependent cell constraints
+    #update dependent cell constraints and dependent_cells
     for cell in look_ahead_table[r, c]['dependent_cells']:
         try:
             #print(f"{cell}, {cell[0]}, {cell[1]}")
@@ -154,6 +152,7 @@ def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
         except:
             pass
 
+    
     return
 
 
@@ -161,7 +160,8 @@ def completeStep(look_ahead_table, output_grid):
     if (not puzzleIsComplete(output_grid)):
         try:
             next_cell = select_next(look_ahead_table, output_grid)
-            num_to_assign = check_move(next_cell[0], next_cell[1], look_ahead_table)
+            print(next_cell)
+            num_to_assign = check_move(next_cell[0], next_cell[1], look_ahead_table, output_grid)
             if (num_to_assign != 0):
                 make_move(next_cell[0], next_cell[1], num_to_assign, look_ahead_table, output_grid)
                 return True
@@ -179,7 +179,7 @@ def completeSudoku(look_ahead_table, output_grid):
         completed = completeStep(look_ahead_table, output_grid)
         if (not completed):
             print("Exiting... No possible Moves")
-            sys.exit(1)
+            #sys.exit(1)
 
 
 def puzzleIsComplete(output_grid):
