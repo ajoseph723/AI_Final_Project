@@ -1,21 +1,18 @@
 from flask import Flask, render_template, request, jsonify
-from SudokuSolver import generate_puzzle, board_to_numpy, calculate_dependent_cells, select_next, check_move, make_move
+from SudokuSolver import generate_puzzle, board_to_numpy, calculate_dependent_cells, make_move, completeStep, completeSudoku
 import numpy as np
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    message = None
     if request.method == 'POST':
         if 'action_button' in request.form:
             button_value = request.form['action_button']
-            if button_value == 'do_something':
-                message = "You clicked 'Do Something'!"
-                # Add your specific logic for "Do Something" here
-            elif button_value == 'do_something_else':
-                message = "You clicked 'Do Something Else'!"
-                # Add your specific logic for "Do Something Else" here
+            if button_value == 'nextStep':
+                
+            elif button_value == 'finish':
+
     return render_template('Frontend.html')
 
 @app.route('/sudoku_data')
