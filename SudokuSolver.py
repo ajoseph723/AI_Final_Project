@@ -57,7 +57,7 @@ def select_next(look_ahead_table, output_grid):
             #check if (i, j) has already been assigned
             if output_grid[i, j] == 0:
                 #check if num of constraints is less than current min
-                if len(look_ahead_table[i, j]['constraints']) < min_constraints:
+                if len(look_ahead_table[i, j]['constraints']) < min_constraints and len(look_ahead_table[i, j]['constraints']) != 0:
                     most_constrained.clear()
                     most_constrained.append((i, j))
                     min_constraints = len(look_ahead_table[i, j]['constraints'])
@@ -79,17 +79,18 @@ def select_next(look_ahead_table, output_grid):
 #makes sure the move leaves a possible constraint for every depependent cell
 #INPUT cell (r, c) to check moves, look_ahead_table to use to check
 #RETURNS number to assign (0 if no numbers worked)
-def check_move(r, c, look_ahead_table):
+def check_move(r, c, look_ahead_table, output_grid, current_iteration, max_iteration=5):
     #the cell we are checking moves for
     cell = look_ahead_table[r, c]
 
     #iterates through contraints for cell
     for constraint_value in cell['constraints']:
-        if valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table):
+        look_ahead_table_copy = look_ahead_table
+        if valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table_copy, output_grid):
             return constraint_value
     return 0
 
-def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, visited=None):
+def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, output_grid, visited=None):
     if visited is None:
         visited = set()
 
@@ -110,21 +111,24 @@ def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, visited=
             only_value = dependent["constraints"][0]
             if (only_value == constraint_value):
                 return False
-            if not valid_value_by_look_ahead(dR, dC, only_value, look_ahead_table, visited):
-                return False
-        else:
-            # If eliminating THIS value leaves it with no remaining valid values → contradiction
-            if len(dependent["constraints"]) == 2 and constraint_value in dependent["constraints"]:
-                # It had two choices, we remove one, leaving one
-                remaining_value = [v for v in dependent["constraints"] if v != constraint_value][0]
+            
+    #update cell (r, c) constraints
+    look_ahead_table[r, c]['constraints'] = list()
 
-                # Now recursively check that forced value
-                if not valid_value_by_look_ahead(dR, dC, remaining_value, look_ahead_table, visited):
-                    return False
+    #update dependent cell constraints
+    for cell in look_ahead_table[r, c]['dependent_cells']:
+        try:
+            #print(f"{cell}, {cell[0]}, {cell[1]}")
+            row = cell[0]
+            col = cell[1]
+            #print(look_ahead_table[row, col]['constraints'])
+            look_ahead_table[cell[0], cell[1]]['constraints'].remove(constraint_value)
+        except:
+            pass
 
-            # If it has more than 2 values, no immediate forced assignment occurs,
-            # so no recursion needed for this dependent cell.
-
+    next_cell = select_next(look_ahead_table, output_grid)
+    
+    
     return True
             
 
@@ -158,8 +162,11 @@ def completeStep(look_ahead_table, output_grid):
         try:
             next_cell = select_next(look_ahead_table, output_grid)
             num_to_assign = check_move(next_cell[0], next_cell[1], look_ahead_table)
-            make_move(next_cell[0], next_cell[1], num_to_assign, look_ahead_table, output_grid)
-            return True
+            if (num_to_assign != 0):
+                make_move(next_cell[0], next_cell[1], num_to_assign, look_ahead_table, output_grid)
+                return True
+            else:
+                return False
         except:
             return False
     else:
@@ -169,7 +176,10 @@ def completeStep(look_ahead_table, output_grid):
 
 def completeSudoku(look_ahead_table, output_grid):
     while(not puzzleIsComplete(output_grid)):
-        completeStep(look_ahead_table, output_grid)
+        completed = completeStep(look_ahead_table, output_grid)
+        if (not completed):
+            print("Exiting... No possible Moves")
+            sys.exit(1)
 
 
 def puzzleIsComplete(output_grid):
@@ -179,45 +189,3 @@ def puzzleIsComplete(output_grid):
                 return False
     
     return True
-
-
-generated_grid = generate_puzzle(0.5)
-sudoku_output = board_to_numpy(generated_grid.board)
-
-
-sudoku_look_ahead_table = np.empty((9, 9), dtype=object)
-
-for r in range(9):
-    for c in range(9):
-
-        dependent_cells = calculate_dependent_cells(r, c, sudoku_output)
-
-        #create a dictionary for each cell
-        #constraints are possible values for the cell
-        #dependent_cells are cells that are affected by the value of cell (r, c)
-        cell_data = {
-            "constraints": [],
-            "dependent_cells": dependent_cells
-        }
-        if(sudoku_output[r, c] > 0):
-            set_value = int(sudoku_output[r, c])
-            cell_data['constraints'].append(set_value)
-        else:
-            cell_data['constraints'] = list(range(1, 10))
-        
-        #assign the value to the cell in the look ahead table
-        sudoku_look_ahead_table[r, c] = cell_data  # Assign a new list to each cell
-
-#setting up every cell from initial grid
-for r in range(9):
-    for c in range(9):
-        if(sudoku_output[r, c] > 0):
-            make_move(r, c, int(sudoku_output[r, c]), sudoku_look_ahead_table, sudoku_output)
-
-cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
-
-print("Unsolved: ")
-print(generated_grid)
-print("Attempting to solve.")
-print("Solved: ")
-print(generated_grid.solve())
