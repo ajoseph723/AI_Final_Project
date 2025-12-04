@@ -1,2 +1,2 @@
 env/
-sudoku_output.json/
+__pycache__/
