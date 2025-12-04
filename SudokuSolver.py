@@ -4,7 +4,7 @@ from sudoku import Sudoku
 import json
 from flask import Flask, render_template, request
 
-def generate_puzzle(difficulty=0.5):
+def generate_puzzle(difficulty=0.9):
     puzzle = None
     while puzzle is None:                     # keep trying until valid
         puzzle = Sudoku(3).difficulty(difficulty)
