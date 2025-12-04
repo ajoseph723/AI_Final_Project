@@ -190,22 +190,9 @@ for r in range(9):
         if(sudoku_output[r, c] > 0):
             make_move(r, c, int(sudoku_output[r, c]), sudoku_look_ahead_table, sudoku_output)
 
-
-for r in range(9):
-    for c in range(9):
-        print(sudoku_look_ahead_table[r, c]['constraints'])
-
-
-# Access a specific cell and its list
-print(f"\nList in cell (0, 0): {sudoku_look_ahead_table[0, 0]['constraints']}")
-print(f"List in cell (4, 5): {sudoku_look_ahead_table[4, 5]['constraints']}")
-
-for r in range(9):
-    for c in range(9):
-        print(sudoku_look_ahead_table[r, c]['dependent_cells'])
-
 cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
 
+<<<<<<< HEAD
 print(cell_to_select)
 
 print(sudoku_output)
@@ -217,6 +204,8 @@ print(sudoku_output)
 
 
 
+=======
+>>>>>>> 0c320922f3fb19ba3097a603674d057bd89c389f
 
 with open("sudoku_output.json", "w") as f:
     json.dump(sudoku_output.tolist(), f)
