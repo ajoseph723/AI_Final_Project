@@ -200,10 +200,3 @@ print("Attempting to solve.")
 print("Solved: ")
 completeStep(sudoku_look_ahead_table, sudoku_output)
 print(sudoku_output)
-
-
-
-
-with open("sudoku_output.json", "w") as f:
-    json.dump(sudoku_output.tolist(), f)
-
