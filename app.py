@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from SudokuSolver import generate_puzzle, board_to_numpy, calculate_dependent_cells, select_next, check_move, make_move
+from SudokuSolver import generate_puzzle, board_to_numpy, calculate_dependent_cells, make_move, completeStep
 import numpy as np
 
 app = Flask(__name__)
@@ -47,6 +47,10 @@ def sudoku_data():
         for c in range(9):
             print(sudoku_look_ahead_table[r, c]['constraints'])
     return jsonify(sudoku_output.tolist())
+
+@app.route('/complete_step')
+def nextStep(look_ahead_table, output_grid):
+    completeStep(look_ahead_table, output_grid)
 
 if __name__ == '__main__':
     app.run(debug=True)
