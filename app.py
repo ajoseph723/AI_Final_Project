@@ -16,9 +16,9 @@ def index():
         if 'action_button' in request.form:
             button_value = request.form['action_button']
             if button_value == 'nextStep':
-                print("sometngi")
+                completeStep(sudoku_look_ahead_table, sudoku_output)
             elif button_value == 'finish':
-                print("somethingelse")
+                completeSudoku(sudoku_look_ahead_table, sudoku_output)
     return render_template('Frontend.html')
 
 @app.route('/sudoku_data')
