@@ -129,6 +129,34 @@ def make_move(r, c, num_to_assign, look_ahead_table, output_grid):
     return
 
 
+def completeStep(look_ahead_table, output_grid):
+    if (not puzzleIsComplete(output_grid)):
+        try:
+            next_cell = select_next(look_ahead_table, output_grid)
+            num_to_assign = check_move(next_cell[0], next_cell[1], look_ahead_table)
+            make_move(next_cell[0], next_cell[1], num_to_assign, look_ahead_table, output_grid)
+            return True
+        except:
+            return False
+    else:
+        return False
+
+
+
+def completeSudoku(look_ahead_table, output_grid):
+    while(not puzzleIsComplete(output_grid)):
+        completeStep(look_ahead_table, output_grid)
+
+
+def puzzleIsComplete(output_grid):
+    for r in range(9):
+        for c in range(9):
+            if (output_grid[r, c] == 0):
+                return False
+    
+    return True
+
+
 generated_grid = generate_puzzle(0.5)
 sudoku_output = board_to_numpy(generated_grid.board)
 
@@ -181,6 +209,13 @@ cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
 print(cell_to_select)
 
 print(sudoku_output)
+
+print("Attempting to solve.")
+print("Solved: ")
+completeStep(sudoku_look_ahead_table, sudoku_output)
+print(sudoku_output)
+
+
 
 
 with open("sudoku_output.json", "w") as f:
