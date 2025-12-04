@@ -4,8 +4,18 @@ import numpy as np
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    message = None
+    if request.method == 'POST':
+        if 'action_button' in request.form:
+            button_value = request.form['action_button']
+            if button_value == 'do_something':
+                message = "You clicked 'Do Something'!"
+                # Add your specific logic for "Do Something" here
+            elif button_value == 'do_something_else':
+                message = "You clicked 'Do Something Else'!"
+                # Add your specific logic for "Do Something Else" here
     return render_template('Frontend.html')
 
 @app.route('/sudoku_data')
