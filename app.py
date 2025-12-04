@@ -51,9 +51,6 @@ def sudoku_data():
             if(sudoku_output[r, c] > 0):
                 make_move(r, c, int(sudoku_output[r, c]), sudoku_look_ahead_table, sudoku_output)
 
-    for r in range(9):
-        for c in range(9):
-            print(sudoku_look_ahead_table[r, c]['constraints'])
     return jsonify(sudoku_output.tolist())
 
 if __name__ == '__main__':
