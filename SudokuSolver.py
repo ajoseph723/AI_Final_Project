@@ -192,7 +192,6 @@ for r in range(9):
 
 cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
 
-<<<<<<< HEAD
 print(cell_to_select)
 
 print(sudoku_output)
@@ -204,8 +203,6 @@ print(sudoku_output)
 
 
 
-=======
->>>>>>> 0c320922f3fb19ba3097a603674d057bd89c389f
 
 with open("sudoku_output.json", "w") as f:
     json.dump(sudoku_output.tolist(), f)
