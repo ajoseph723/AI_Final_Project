@@ -4,24 +4,25 @@ import numpy as np
 
 app = Flask(__name__)
 
+puzzle = generate_puzzle()
+sudoku_output = board_to_numpy(puzzle.board)
+
+#look ahead table orgiginal setup
+sudoku_look_ahead_table = np.empty((9, 9), dtype=object)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         if 'action_button' in request.form:
             button_value = request.form['action_button']
             if button_value == 'nextStep':
-                
+                print("sometngi")
             elif button_value == 'finish':
-
+                print("somethingelse")
     return render_template('Frontend.html')
 
 @app.route('/sudoku_data')
 def sudoku_data():
-    puzzle = generate_puzzle()
-    sudoku_output = board_to_numpy(puzzle.board)
-
-    #look ahead table orgiginal setup
-    sudoku_look_ahead_table = np.empty((9, 9), dtype=object)
 
     for r in range(9):
         for c in range(9):
