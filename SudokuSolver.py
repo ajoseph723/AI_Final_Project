@@ -192,11 +192,8 @@ for r in range(9):
 
 cell_to_select = select_next(sudoku_look_ahead_table, sudoku_output)
 
-print(cell_to_select)
-
-print(sudoku_output)
-
+print("Unsolved: ")
+print(generated_grid)
 print("Attempting to solve.")
 print("Solved: ")
-completeStep(sudoku_look_ahead_table, sudoku_output)
-print(sudoku_output)
+print(generated_grid.solve())
