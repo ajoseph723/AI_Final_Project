@@ -85,24 +85,48 @@ def check_move(r, c, look_ahead_table):
 
     #iterates through contraints for cell
     for constraint_value in cell['constraints']:
-        valid = True
-        #checks the constraint against the constraints of the dependent_cells of cell
-        for dCell in cell['dependent_cells']:
-            row = dCell[0]
-            col = dCell[1] 
-            dependent_cell = look_ahead_table[row, col] 
-
-            #only necessary check is to ensure that the dependent cell with 1 constraint
-            #is not going to become invalidated with this move.
-            #Other dependent cells with >1 constraints would still have at least 1 constraint left
-            if (len(dependent_cell["constraints"]) == 1):
-                if (dependent_cell["constraints"][0] == constraint_value):
-                    valid = False
-                    break
-
-        if (valid):
+        if valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table):
             return constraint_value
     return 0
+
+def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, visited=None):
+    if visited is None:
+        visited = set()
+
+    if (r, c, constraint_value) in visited:
+        return True
+    
+    visited.add((r, c, constraint_value))
+    cell = look_ahead_table[r, c]
+
+    #checks the constraint against the constraints of the dependent_cells of cell
+    for dR, dC in cell["dependent_cells"]:
+        dependent = look_ahead_table[dR, dC]
+
+        #only necessary check is to ensure that the dependent cell with 1 constraint
+        #is not going to become invalidated with this move.
+        #Other dependent cells with >1 constraints would still have at least 1 constraint left
+        if len(dependent["constraints"]) == 1:
+            only_value = dependent["constraints"][0]
+            if (only_value == constraint_value):
+                return False
+            if not valid_value_by_look_ahead(dR, dC, only_value, look_ahead_table, visited):
+                return False
+        else:
+            # If eliminating THIS value leaves it with no remaining valid values → contradiction
+            if len(dependent["constraints"]) == 2 and constraint_value in dependent["constraints"]:
+                # It had two choices, we remove one, leaving one
+                remaining_value = [v for v in dependent["constraints"] if v != constraint_value][0]
+
+                # Now recursively check that forced value
+                if not valid_value_by_look_ahead(dR, dC, remaining_value, look_ahead_table, visited):
+                    return False
+
+            # If it has more than 2 values, no immediate forced assignment occurs,
+            # so no recursion needed for this dependent cell.
+
+    return True
+            
 
 #assumes move will work
 #sets num_to_assign to the output_grid cell (r, c)
