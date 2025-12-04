@@ -132,6 +132,14 @@
             board.appendChild(cell);
           }
         }
+
+        function nextStep() {
+
+        }
+
+        function finishSudoku(grid) {
+
+        }
       }
 
       window.onload = loadSudoku;
@@ -142,8 +150,8 @@
     <div id="container">
       <div id="sudokuBoard"></div>
       <div id="buttonContainer">
-        <button id="nextStepButton">Next Step</button>
-        <button id="finishButton">Finish</button>
+        <button id="nextStepButton" onclick="nextStep()">Next Step</button>
+        <button id="finishButton" onclick="finishSudoku()">Finish</button>
       </div>
     </div>
   </body>
