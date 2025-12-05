@@ -78,6 +78,8 @@ def select_next(look_ahead_table, output_grid):
 #checks every possible available constraint for the cell until one works
 #checks how assigning a constraint affects the constraints of the dependent_cells
 #makes sure the move leaves a possible constraint for every depependent cell
+#checks max_iterations ahead (so checks max_iteration moves)
+#uses valid_value_by_look_ahead
 #INPUT cell (r, c) to check moves, look_ahead_table to use to check
 #RETURNS number to assign (0 if no numbers worked)
 def check_move(r, c, look_ahead_table, output_grid, current_iteration=0, max_iteration=5):
@@ -92,6 +94,10 @@ def check_move(r, c, look_ahead_table, output_grid, current_iteration=0, max_ite
             return constraint_value
     return 0
 
+
+#checks every dependent_cell to make sure it will have valid constraints
+#checks it hasn't checked so far the puzzle is complete
+#selects next cell and then runs make move on that cell (checks next move)
 def valid_value_by_look_ahead(r, c, constraint_value, look_ahead_table, output_grid, current_iteration, max_iteration):
     cell = look_ahead_table[r, c]
 
